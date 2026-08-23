@@ -1,0 +1,24 @@
+{
+  "name": "moradon-fortune",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run tests",
+    "simulate": "tsx scripts/simulate.ts",
+    "preview": "vite preview --host 0.0.0.0",
+    "check:visual": "node scripts/visual-check.mjs"
+  },
+  "dependencies": {
+    "pixi.js": "^8.13.2"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.62.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^4.1.11"
+  }
+}

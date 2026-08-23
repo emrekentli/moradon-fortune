@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.chrome-preview-profile*/
+preview*.png
+*runtime-check*.png
+artifacts/

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#09070f" />
+    <title>Moradon Fortune — Eğitim Demosu</title>
+  </head>
+  <body>
+    <section id="intro-screen" hidden aria-label="Moradon Fortune giriş ekranı">
+      <div class="intro-vignette" aria-hidden="true"></div>
+      <div class="intro-runes" aria-hidden="true"></div>
+      <div class="intro-content">
+        <div class="intro-emblem" aria-hidden="true"><span></span></div>
+        <p class="intro-kicker">KNIGHT ONLINE'DAN İLHAMLA</p>
+        <h1>MORADON<br><span>FORTUNE</span></h1>
+        <div class="intro-rule" aria-hidden="true"><i></i></div>
+        <p class="intro-copy">Anvil'in ateşini uyandır.<br>Moradon'un servetini keşfet.</p>
+        <button id="enter-game" type="button">
+          <span>OYUNA GİR</span>
+          <small>ENTER veya SPACE</small>
+        </button>
+        <p class="intro-disclaimer">EĞİTİM DEMOSU · GERÇEK PARA İÇERMEZ</p>
+      </div>
+      <div class="intro-loading" aria-hidden="true"><span>REALM HAZIR</span><i></i></div>
+    </section>
+    <main id="game" aria-label="Moradon Fortune slot oyunu"></main>
+    <div id="loading">MORADON'A BAĞLANILIYOR…</div>
+    <section id="mobile-hud" aria-label="Mobil oyun kontrolleri">
+      <strong>MORADON FORTUNE</strong>
+      <output id="mobile-status">Moradon seni bekliyor.</output>
+      <div class="mobile-stats">
+        <span>BAKİYE <b id="mobile-balance">1000.00</b></span>
+        <span>BAHİS <b id="mobile-bet">10.00</b></span>
+        <span>KAZANÇ <b id="mobile-win">0.00</b></span>
+      </div>
+      <div class="mobile-actions">
+        <button id="mobile-bet-down" aria-label="Bahsi azalt">−</button>
+        <button id="mobile-spin">SPIN</button>
+        <button id="mobile-bet-up" aria-label="Bahsi artır">+</button>
+        <button id="mobile-auto" aria-label="On otomatik dönüş">AUTO</button>
+        <button id="mobile-turbo" aria-label="Turbo modu">⚡</button>
+        <button id="mobile-info" aria-label="Ödeme bilgisi">i</button>
+        <button id="mobile-mute" aria-label="Sesi aç veya kapat">♪</button>
+      </div>
+    </section>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
