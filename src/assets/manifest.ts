@@ -6,7 +6,7 @@ export const assetManifest = {
       name: 'core',
       assets: [
         { alias: 'moradon', src: assetUrl('moradon-background-v1.png') },
-        { alias: 'symbols', src: assetUrl('ko-symbols-atlas-v1.png') },
+        { alias: 'symbols', src: assetUrl('ko-symbols-atlas-v2.png') },
         { alias: 'wild-animation', src: assetUrl('trina-wild-animation-v2.png') },
         { alias: 'raptor-animation', src: assetUrl('raptor-win-animation-v2.png') },
         { alias: 'bow-animation', src: assetUrl('iron-bow-win-animation-v1.png') },
