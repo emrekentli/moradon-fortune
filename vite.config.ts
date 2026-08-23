@@ -4,9 +4,7 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'pages' ? '/moradon-fortune/' : '/',
   build: {
     rollupOptions: {
-      output: {
-        inlineDynamicImports: true,
-      },
+      external: ['pixi.js'],
     },
   },
   server: {
