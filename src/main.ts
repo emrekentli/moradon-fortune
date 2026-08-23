@@ -603,12 +603,14 @@ async function dismissIntro(): Promise<void> {
 }
 
 enterGameButton?.addEventListener('click', () => void dismissIntro());
-document.querySelector('#loading')?.classList.add('hidden');
 if (!skipIntro && introScreen) {
   introActive = true;
+  introScreen.classList.add('visible');
   introScreen.hidden = false;
-  requestAnimationFrame(() => introScreen.classList.add('visible'));
+  requestAnimationFrame(() => document.querySelector('#loading')?.classList.add('hidden'));
   window.setTimeout(() => enterGameButton?.focus(), 850);
+} else {
+  document.querySelector('#loading')?.classList.add('hidden');
 }
 
 type DebugScenario = keyof typeof DEBUG_SCENARIOS;
