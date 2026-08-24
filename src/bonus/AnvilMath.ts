@@ -1,10 +1,6 @@
 export const ANVIL_CHANCES = [1, 1, 0.9, 0.78, 0.62, 0.46, 0.3, 0.18, 0.1] as const;
 export const TRINA_CHANCE_BOOST = 0.15;
 
-export function attemptsForScatters(scatterCount: number): number {
-  return Math.max(5, Math.min(7, 5 + scatterCount - 3));
-}
-
 export function trinaChargesForScatters(scatterCount: number): number {
   return Math.max(1, Math.min(3, scatterCount - 2));
 }

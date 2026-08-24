@@ -33,7 +33,7 @@ Geliştirici paneli için oyunu `/?debug=1` adresinde açın. Buradan seed uygul
 - STOP ile 500 ms altında kontrollü hızlı durdurma
 - Knight Online referanslı Trina, Raptor ve Iron Bow kare animasyonları; diğer sembollere özel hareket/renk efektleri
 - Çizgi çizgi kazanç döngüsü, renkli parçacıklar, coin rain, ekran sarsıntısı ve atlanabilir Big Win sunumu
-- 3/4/5 Scatter ile 5/6/7 Anvil denemesi, +8 yolu ve oyuncunun seçtiği 1/2/3 Trina başarı artırımı
+- 3/4/5 Scatter ile 1/2/3 Trina hakkı; item yanana veya +8 olana kadar kesintisiz Anvil yükseltmesi
 - Stereo makara duruşları, metal Anvil darbesi, WebAudio olay sesleri, Moradon atmosferi ve mute
 - 10/25/50/100 spin AUTO; birbirinden ayrı Turbo Spin ve Hızlı Spin seçenekleri; son beş oyun geçmişi ve bütün sembolleri içeren ödeme tablosu
 - Masaüstü, oynanabilir portre mobil HUD, safe-area desteği ve klavye kısayolları

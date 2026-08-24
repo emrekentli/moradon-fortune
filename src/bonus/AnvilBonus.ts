@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
 import type { ParticleSystem } from '../effects/ParticleSystem';
 import type { RandomSource } from '../math/Random';
-import { attemptsForScatters, trinaChargesForScatters, upgradeChance } from './AnvilMath';
+import { trinaChargesForScatters, upgradeChance } from './AnvilMath';
 
 export type AnvilResult = {
   level: number;
@@ -25,7 +25,7 @@ export class AnvilBonus {
   readonly container = new Container();
   private readonly weapon: Sprite;
   private readonly levelText: Text;
-  private readonly attemptsText: Text;
+  private readonly chanceText: Text;
   private readonly statusText: Text;
   private readonly chanceFill: Graphics;
   private readonly trinaBadge: Container;
@@ -33,12 +33,12 @@ export class AnvilBonus {
   private readonly actionPlate: Graphics;
   private readonly actionLabel: Text;
   private readonly energyGlow: Graphics;
-  private attempts = 0;
   private level = 1;
   private trinaCharges = 0;
   private trinaSelected = false;
   private busy = false;
   private finished = false;
+  private burned = false;
   private resolveResult: ((result: AnvilResult) => void) | null = null;
 
   constructor(private readonly options: AnvilBonusOptions) {
@@ -90,9 +90,9 @@ export class AnvilBonus {
       .stroke({ color: 0x8e743a, width: 2 });
     this.chanceFill = new Graphics();
 
-    this.attemptsText = this.text('', 14, 0xcfc3a7, '700');
-    this.attemptsText.anchor.set(0.5);
-    this.attemptsText.position.set(640, 550);
+    this.chanceText = this.text('', 14, 0xcfc3a7, '700');
+    this.chanceText.anchor.set(0.5);
+    this.chanceText.position.set(640, 550);
 
     this.trinaBadge = new Container();
     const trinaPanel = new Graphics()
@@ -138,7 +138,7 @@ export class AnvilBonus {
       this.statusText,
       chanceBack,
       this.chanceFill,
-      this.attemptsText,
+      this.chanceText,
       this.trinaBadge,
       action,
     );
@@ -146,12 +146,12 @@ export class AnvilBonus {
   }
 
   async open(scatterCount: number): Promise<AnvilResult> {
-    this.attempts = attemptsForScatters(scatterCount);
     this.level = 1;
     this.trinaCharges = trinaChargesForScatters(scatterCount);
     this.trinaSelected = false;
     this.busy = false;
     this.finished = false;
+    this.burned = false;
     this.container.alpha = 0;
     this.container.visible = true;
     this.weapon.rotation = 0;
@@ -169,11 +169,11 @@ export class AnvilBonus {
 
   async openDebug(targetLevel: number): Promise<AnvilResult> {
     this.level = Math.max(1, Math.min(8, Math.round(targetLevel)));
-    this.attempts = Math.max(1, 8 - this.level);
     this.trinaCharges = 3;
     this.trinaSelected = false;
     this.busy = false;
     this.finished = this.level >= 8;
+    this.burned = false;
     this.container.alpha = 0;
     this.container.visible = true;
     this.weapon.rotation = 0;
@@ -209,7 +209,6 @@ export class AnvilBonus {
     await this.chargeEnergy();
     this.options.playSound('anvil-hit');
     const success = this.options.random.next() < chance;
-    this.attempts -= 1;
 
     if (success) {
       this.level += 1;
@@ -218,22 +217,24 @@ export class AnvilBonus {
       this.options.playSound(this.level >= 5 ? 'big-win' : 'win');
       this.statusText.text = `UPGRADE BAŞARILI! Item +${this.level}`;
     } else {
+      this.burned = true;
       this.weapon.tint = 0xff6655;
       this.options.particles.burst(640, 345, 0xff3b28, 46);
       this.statusText.text = usedTrina
-        ? `Trina şansı artırdı ancak upgrade başarısız: +${this.level}`
-        : `Upgrade başarısız. Item +${this.level} seviyesinde kaldı.`;
-      this.attempts = 0;
+        ? `Trina şansı artırdı ama item +${this.level} basarken yandı!`
+        : `UPGRADE BAŞARISIZ! Item +${this.level} basarken yandı.`;
     }
 
     await wait(650);
     this.weapon.tint = 0xffffff;
     this.updateLabels();
-    if (this.attempts <= 0 || this.level >= 8) {
+    if (this.burned || this.level >= 8) {
       this.finished = true;
       this.actionLabel.text = 'BONUSU AL';
       this.drawActionButton(0x8a5a12);
-      this.statusText.text = `+${this.level} item • ${this.multiplier.toFixed(2)}x Free Spin çarpanı`;
+      this.statusText.text = this.burned
+        ? `ITEM YANDI • Ulaşılan +${this.level} seviyesi • ${this.multiplier.toFixed(2)}x çarpan`
+        : `MAKSİMUM +8 • ${this.multiplier.toFixed(2)}x Free Spin çarpanı`;
     } else {
       this.drawActionButton(0x176d31);
     }
@@ -272,7 +273,11 @@ export class AnvilBonus {
   private updateLabels(): void {
     this.levelText.text = `+${this.level}`;
     const chance = upgradeChance(this.level + 1, this.trinaSelected && this.trinaCharges > 0);
-    this.attemptsText.text = `KALAN DENEME: ${this.attempts}  •  SONRAKİ ŞANS: %${Math.round(chance * 100)}`;
+    this.chanceText.text = this.burned
+      ? `ITEM YANDI  •  KAZANILAN ÇARPAN: ${this.multiplier.toFixed(2)}x`
+      : this.level >= 8
+        ? 'MAKSİMUM SEVİYEYE ULAŞILDI'
+        : `SONRAKİ UPGRADE ŞANSI: %${Math.round(chance * 100)}`;
     this.trinaText.text = this.trinaCharges > 0
       ? `TRİNA x${this.trinaCharges}\n${this.trinaSelected ? 'AKTİF • +%15' : 'KULLAN'}`
       : 'TRİNA BİTTİ';

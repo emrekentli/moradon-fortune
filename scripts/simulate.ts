@@ -1,6 +1,6 @@
 import { SeededRandom } from '../src/math/Random';
 import { SlotEngine } from '../src/math/SlotEngine';
-import { attemptsForScatters, trinaChargesForScatters, upgradeChance } from '../src/bonus/AnvilMath';
+import { trinaChargesForScatters, upgradeChance } from '../src/bonus/AnvilMath';
 
 const spins = Math.max(1, Number.parseInt(process.argv[2] ?? '250000', 10));
 const seed = Number.parseInt(process.argv[3] ?? '20260824', 10);
@@ -15,11 +15,9 @@ let freeSpinsPlayed = 0;
 let biggestMultiplier = 0;
 
 function anvilAward(scatterCount: number): { spins: number; multiplier: number } {
-  let attempts = attemptsForScatters(scatterCount);
   let trinaCharges = trinaChargesForScatters(scatterCount);
   let level = 1;
-  while (attempts > 0 && level < 8) {
-    attempts -= 1;
+  while (level < 8) {
     const useTrina = trinaCharges > 0 && level + 1 >= 4;
     if (useTrina) trinaCharges -= 1;
     if (bonusRandom.next() < upgradeChance(level + 1, useTrina)) level += 1;
