@@ -5,6 +5,8 @@ export type ReelSpinOptions = {
   duration: number;
   maxSpeed: number;
   anticipation?: boolean;
+  landingDuration?: number;
+  settleDuration?: number;
 };
 
 const waitFrame = (): Promise<number> => new Promise(requestAnimationFrame);
@@ -60,8 +62,8 @@ export class Reel {
     let previous = started;
     const totalHeight = (this.rowCount + 2) * this.cellHeight;
     const wrapAt = (this.rowCount + 1) * this.cellHeight;
-    const landingDuration = options.anticipation ? 650 : 500;
-    const cruiseDuration = Math.max(280, options.duration - landingDuration);
+    const landingDuration = options.landingDuration ?? (options.anticipation ? 650 : 500);
+    const cruiseDuration = Math.max(150, options.duration - landingDuration);
 
     while (true) {
       const now = await waitFrame();
@@ -86,14 +88,14 @@ export class Reel {
       if (elapsed >= cruiseDuration || (this.stopRequested && elapsed >= 280)) break;
     }
 
-    await this.land(finalResult, stopIndex, landingDuration);
+    await this.land(finalResult, stopIndex, landingDuration, options.settleDuration);
   }
 
   requestStop(): void {
     this.stopRequested = true;
   }
 
-  private async land(finalResult: SymbolId[], stopIndex: number, duration: number): Promise<void> {
+  private async land(finalResult: SymbolId[], stopIndex: number, duration: number, settleDuration?: number): Promise<void> {
     const outgoing = [...this.sprites];
     const outgoingStartY = outgoing.map((sprite) => sprite.y);
     const topmostY = Math.min(...outgoing.map((sprite) => sprite.y));
@@ -132,7 +134,7 @@ export class Reel {
     this.sprites.splice(0, this.sprites.length, top, ...incoming, bottom);
     this.symbolIds.splice(0, this.symbolIds.length, topId, ...finalResult, bottomId);
     this.stripCursor = this.normalize(stopIndex - 2);
-    await this.settleFrom(12, this.stopRequested ? 140 : 210);
+    await this.settleFrom(12, this.stopRequested ? 140 : settleDuration ?? 210);
     this.blur.strengthY = 0;
   }
 

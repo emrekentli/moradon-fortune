@@ -35,7 +35,7 @@ Geliştirici paneli için oyunu `/?debug=1` adresinde açın. Buradan seed uygul
 - Çizgi çizgi kazanç döngüsü, renkli parçacıklar, coin rain, ekran sarsıntısı ve atlanabilir Big Win sunumu
 - 3/4/5 Scatter ile 5/6/7 Anvil denemesi, +8 yolu ve oyuncunun seçtiği 1/2/3 Trina başarı artırımı
 - Stereo makara duruşları, metal Anvil darbesi, WebAudio olay sesleri, Moradon atmosferi ve mute
-- 10 spin AUTO, Turbo modu, son beş oyun geçmişi ve bütün sembolleri içeren ödeme tablosu
+- 10/25/50/100 spin AUTO; birbirinden ayrı Turbo Spin ve Hızlı Spin seçenekleri; son beş oyun geçmişi ve bütün sembolleri içeren ödeme tablosu
 - Masaüstü, oynanabilir portre mobil HUD, safe-area desteği ve klavye kısayolları
 - Seeded RNG, deterministik senaryolar, durum makinesi testleri ve bonus/retrigger dahil RTP simülatörü
 - Pixi asset bundle manifesti ve sekme arka plandayken otomatik render durdurma
@@ -44,10 +44,12 @@ Geliştirici paneli için oyunu `/?debug=1` adresinde açın. Buradan seed uygul
 
 - `SPIN`: Döndür; dönüş sırasında `STOP`: hızlı durdur
 - `−` / `+`: Bahis değiştir
-- `AUTO`: 10 otomatik dönüş; `⚡`: Turbo modu
+- `AUTO`: Otomatik oyun ayarlarını aç; aktif otomatik oyunu durdur
+- `Turbo Spin`: Makara dönüşünü, inişini ve sekmesini en kısa süreye indirir; scatter bekletmesini kapatır
+- `Hızlı Spin`: Makara akışını ve kazanç sunumunu kısaltır; otomatik çevrimler arasındaki beklemeyi azaltır
 - Kazanç sunumunda `DEVAM`: animasyonu tamamla
 - `♪`: Sesi aç/kapat
-- Klavye: `Space`, `←`, `→`, `A`, `T`, `M`, `I`
+- Klavye: `Space`, `←`, `→`, `A`, `M`, `I`
 
 ## Matematik doğrulaması
 

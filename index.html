@@ -27,6 +27,49 @@
       </div>
       <div class="intro-loading" aria-hidden="true"><span>REALM HAZIR</span><i></i></div>
     </section>
+    <section id="auto-dialog" class="game-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="auto-dialog-title">
+      <button class="dialog-backdrop" type="button" data-close-dialog aria-label="Kapat"></button>
+      <div class="game-dialog-panel">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="Kapat">×</button>
+        <p class="dialog-kicker">MORADON FORTUNE</p>
+        <h2 id="auto-dialog-title">OTOMATİK OYUN AYARLARI</h2>
+        <div class="auto-options">
+          <label class="option-card">
+            <input id="auto-turbo" type="checkbox" />
+            <span class="option-check"></span>
+            <strong>TURBO SPIN</strong>
+            <small>En hızlı makara ve iniş</small>
+          </label>
+          <label class="option-card">
+            <input id="auto-quick" type="checkbox" />
+            <span class="option-check"></span>
+            <strong>HIZLI SPIN</strong>
+            <small>Kısa sunum ve bekleme</small>
+          </label>
+        </div>
+        <p class="dialog-label">OTOMATİK SPIN SAYISI</p>
+        <div class="spin-count-options" role="group" aria-label="Otomatik spin sayısı">
+          <button type="button" data-spin-count="10">10</button>
+          <button type="button" data-spin-count="25" class="selected">25</button>
+          <button type="button" data-spin-count="50">50</button>
+          <button type="button" data-spin-count="100">100</button>
+        </div>
+        <button id="start-auto" class="dialog-primary" type="button">OTOMATİK OYUNU BAŞLAT (25)</button>
+      </div>
+    </section>
+    <section id="buy-dialog" class="game-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="buy-dialog-title">
+      <button class="dialog-backdrop" type="button" data-close-dialog aria-label="Kapat"></button>
+      <div class="game-dialog-panel buy-panel">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="Kapat">×</button>
+        <div class="buy-orb" aria-hidden="true"></div>
+        <p class="dialog-kicker">MAGIC ANVIL</p>
+        <h2 id="buy-dialog-title">BONUSU SATIN AL</h2>
+        <p class="buy-copy">Magic Anvil yükseltmesini doğrudan aç ve Free Spin ödülünü belirle.</p>
+        <div class="buy-price"><span>FİYAT</span><strong id="buy-price">500.00 Noah</strong></div>
+        <button id="confirm-buy" class="dialog-primary" type="button">ANVIL'İ BAŞLAT</button>
+        <small class="demo-note">Yalnızca demo bakiyesi kullanılır.</small>
+      </div>
+    </section>
     <main id="game" aria-label="Moradon Fortune slot oyunu"></main>
     <div id="loading">MORADON'A BAĞLANILIYOR…</div>
     <section id="mobile-hud" aria-label="Mobil oyun kontrolleri">
@@ -35,14 +78,14 @@
       <div class="mobile-stats">
         <span>BAKİYE <b id="mobile-balance">1000.00</b></span>
         <span>BAHİS <b id="mobile-bet">10.00</b></span>
-        <span>KAZANÇ <b id="mobile-win">0.00</b></span>
+        <span>SON KAZANÇ <b id="mobile-win">0.00</b></span>
       </div>
+      <button id="mobile-buy" type="button">MAGIC ANVIL SATIN AL</button>
       <div class="mobile-actions">
         <button id="mobile-bet-down" aria-label="Bahsi azalt">−</button>
         <button id="mobile-spin">SPIN</button>
         <button id="mobile-bet-up" aria-label="Bahsi artır">+</button>
-        <button id="mobile-auto" aria-label="On otomatik dönüş">AUTO</button>
-        <button id="mobile-turbo" aria-label="Turbo modu">⚡</button>
+        <button id="mobile-auto" aria-label="Otomatik oyun ayarları">AUTO</button>
         <button id="mobile-info" aria-label="Ödeme bilgisi">i</button>
         <button id="mobile-mute" aria-label="Sesi aç veya kapat">♪</button>
       </div>

@@ -288,6 +288,188 @@ canvas {
   display: none;
 }
 
+.game-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.game-dialog[hidden] { display: none; }
+
+.dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgb(2 2 7 / 80%);
+  backdrop-filter: blur(6px);
+}
+
+.game-dialog-panel {
+  position: relative;
+  width: min(92vw, 520px);
+  padding: 30px;
+  border: 2px solid #bf8a31;
+  border-radius: 18px;
+  color: #f4dfac;
+  background:
+    radial-gradient(circle at 50% 0, rgb(90 57 21 / 28%), transparent 42%),
+    linear-gradient(155deg, #16131f, #07080e 76%);
+  box-shadow: 0 24px 80px #000, inset 0 0 42px rgb(194 135 40 / 8%);
+  text-align: center;
+  animation: dialog-enter .24s ease-out both;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #755523;
+  border-radius: 50%;
+  color: #d9c9a5;
+  background: #17131d;
+  font: 500 25px/1 Montserrat, sans-serif;
+  cursor: pointer;
+}
+
+.dialog-kicker {
+  margin: 0 0 8px;
+  color: #a99060;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .3em;
+}
+
+.game-dialog-panel h2 {
+  margin: 0 0 25px;
+  color: #ffda6e;
+  font: 800 clamp(19px, 4vw, 27px) Cinzel, serif;
+  letter-spacing: .08em;
+  text-shadow: 0 2px 12px #000;
+}
+
+.auto-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.option-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 27px 1fr;
+  gap: 2px 10px;
+  align-items: center;
+  min-height: 82px;
+  padding: 13px;
+  border: 1px solid #4d412e;
+  border-radius: 12px;
+  background: rgb(9 10 16 / 80%);
+  text-align: left;
+  cursor: pointer;
+}
+
+.option-card input { position: absolute; opacity: 0; pointer-events: none; }
+.option-check {
+  grid-row: 1 / 3;
+  width: 25px;
+  height: 25px;
+  border: 2px solid #776342;
+  border-radius: 7px;
+  background: #08090d;
+}
+
+.option-card input:checked + .option-check {
+  border-color: #e1b443;
+  background: #9d2c20;
+  box-shadow: inset 0 0 0 5px #201318, 0 0 14px rgb(221 168 54 / 28%);
+}
+
+.option-card strong { color: #f1dfb2; font-size: 12px; }
+.option-card small { color: #938a77; font-size: 9px; }
+
+.dialog-label {
+  margin: 24px 0 10px;
+  color: #afa083;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.spin-count-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.spin-count-options button {
+  min-height: 44px;
+  border: 1px solid #6e5630;
+  border-radius: 10px;
+  color: #d8c79f;
+  background: #15131c;
+  font: 800 15px Montserrat, sans-serif;
+  cursor: pointer;
+}
+
+.spin-count-options button.selected {
+  border-color: #f1c24f;
+  color: #fff0b1;
+  background: linear-gradient(#9e3022, #681b1a);
+  box-shadow: 0 0 18px rgb(205 137 39 / 22%);
+}
+
+.dialog-primary {
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid #f1c756;
+  border-radius: 9px;
+  color: #fff1bd;
+  background: linear-gradient(#b63828, #721c1a);
+  box-shadow: 0 8px 24px #000;
+  font: 800 14px Cinzel, serif;
+  letter-spacing: .06em;
+  cursor: pointer;
+}
+
+.buy-panel { width: min(92vw, 440px); }
+.buy-orb {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 18px;
+  border: 2px solid #dfb64b;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 34%, #efff9e, #70d843 25%, #207628 58%, #07170c 75%);
+  box-shadow: 0 0 28px #61c33e, inset -10px -13px 20px rgb(0 0 0 / 48%);
+}
+
+.buy-copy { margin: -10px auto 22px; max-width: 330px; color: #bdb197; font-size: 12px; line-height: 1.6; }
+.buy-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 13px 16px;
+  border: 1px solid #59482b;
+  border-radius: 10px;
+  background: #090a10;
+}
+.buy-price span { color: #95886d; font-size: 9px; letter-spacing: .18em; }
+.buy-price strong { color: #ffe182; font-size: 17px; }
+.demo-note { display: block; margin-top: 13px; color: #746d60; font-size: 8px; letter-spacing: .08em; }
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 #debug-panel {
   position: fixed;
   top: 12px;
@@ -391,6 +573,16 @@ canvas {
     gap: 7px;
   }
 
+  #mobile-buy {
+    min-height: 34px;
+    border: 1px solid #b9872f;
+    border-radius: 8px;
+    color: #f0d58d;
+    background: linear-gradient(90deg, #382118, #6d261e, #382118);
+    font: 800 10px Cinzel, serif;
+    letter-spacing: .08em;
+  }
+
   .mobile-actions button {
     min-width: 0;
     min-height: 42px;
@@ -414,8 +606,15 @@ canvas {
 
   #mobile-bet-down { grid-column: 1; grid-row: 1; font-size: 21px; }
   #mobile-bet-up { grid-column: 4; grid-row: 1; font-size: 21px; }
-  #mobile-auto { grid-column: 1 / 2; grid-row: 2; }
-  #mobile-turbo { grid-column: 2 / 3; grid-row: 2; }
+  #mobile-auto { grid-column: 1 / 3; grid-row: 2; }
   #mobile-info { grid-column: 3 / 4; grid-row: 2; }
   #mobile-mute { grid-column: 4 / 5; grid-row: 2; font-size: 18px; }
+
+  .game-dialog { padding: 12px; }
+  .game-dialog-panel { width: 100%; padding: 25px 16px 18px; border-radius: 15px; }
+  .auto-options { gap: 8px; }
+  .option-card { min-height: 76px; padding: 10px; grid-template-columns: 23px 1fr; gap: 2px 7px; }
+  .option-check { width: 22px; height: 22px; }
+  .option-card strong { font-size: 10px; }
+  .spin-count-options { gap: 6px; }
 }

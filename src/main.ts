@@ -198,7 +198,7 @@ gridLines.stroke({ color: 0xd6a745, alpha: 0.35, width: 2 });
 world.addChild(gridLines);
 
 const hud = new Graphics()
-  .roundRect(95, 595, 1090, 102, 22)
+  .roundRect(142, 595, 1043, 102, 22)
   .fill({ color: 0x070910, alpha: 0.94 })
   .stroke({ color: 0x9b702b, width: 3 });
 world.addChild(hud);
@@ -206,11 +206,14 @@ world.addChild(hud);
 let balance = 1000;
 let betIndex = 1;
 let lastWin = 0;
+let previousSpinWin = 0;
 let freeSpins = 0;
 let freeSpinMultiplier = 1;
 let forcedResult: SpinMatrix | null = null;
 let autoSpins = 0;
 let turbo = false;
+let quickSpin = false;
+let selectedAutoSpins = 25;
 const spinHistory: Array<{ bet: number; win: number; free: boolean }> = [];
 const desktopStatCaptions: Text[] = [];
 
@@ -227,15 +230,27 @@ function addStat(label: string, x: number): Text {
   return value;
 }
 
-const balanceText = addStat('BAKİYE', 190);
-const betText = addStat('BAHİS', 365);
+const balanceText = addStat('BAKİYE', 220);
+const betText = addStat('BAHİS', 390);
 const winText = addStat('KAZANÇ', 540);
+
+const lastWinPanel = new Graphics()
+  .roundRect(12, 595, 116, 102, 18)
+  .fill({ color: 0x090a12, alpha: 0.96 })
+  .stroke({ color: 0x9b702b, width: 2 });
+const lastWinCaption = makeText('SON ÇEVRİM', 9, 0xa99a78, '700');
+lastWinCaption.anchor.set(0.5);
+lastWinCaption.position.set(70, 620);
+const lastSpinWinText = makeText('0.00', 19, 0xffdf7c, '800');
+lastSpinWinText.anchor.set(0.5);
+lastSpinWinText.position.set(70, 654);
+world.addChild(lastWinPanel, lastWinCaption, lastSpinWinText);
 
 const particleSystem = new ParticleSystem(app.ticker);
 world.addChild(particleSystem.container);
 const winPresenter = new WinPresenter(reelManager, particleSystem, {
   symbolFrames: symbolAnimationFrames,
-  isTurbo: () => turbo,
+  isTurbo: () => quickSpin,
   onBigWin: () => void shakeWorld(),
   onCount: (value) => {
     winText.text = value.toFixed(2);
@@ -284,9 +299,9 @@ const muteButton = button(1100, 620, 54, 54, '♪', 0x263d5b, () => {
 });
 world.addChild(muteButton);
 
-const autoButton = button(1100, 505, 70, 36, 'AUTO', 0x3b2754, toggleAuto);
-const turboButton = button(1100, 550, 70, 36, '⚡', 0x3b2754, toggleTurbo);
-world.addChild(autoButton, turboButton);
+const autoButton = button(1100, 530, 70, 42, 'AUTO', 0x3b2754, toggleAuto);
+const buyButton = button(20, 205, 165, 86, 'MAGIC ANVIL\nSATIN AL', 0x6f2b1d, openBuyDialog);
+world.addChild(autoButton, buyButton);
 
 const statusText = makeText('Moradon seni bekliyor.', 14, 0xffe1a1, '600');
 statusText.anchor.set(0.5);
@@ -327,8 +342,96 @@ const anvilBonus = new AnvilBonus({
 world.addChild(anvilBonus.container);
 world.addChild(particleSystem.container);
 
+const autoDialog = document.querySelector<HTMLElement>('#auto-dialog');
+const buyDialog = document.querySelector<HTMLElement>('#buy-dialog');
+const autoTurboInput = document.querySelector<HTMLInputElement>('#auto-turbo');
+const autoQuickInput = document.querySelector<HTMLInputElement>('#auto-quick');
+const startAutoButton = document.querySelector<HTMLButtonElement>('#start-auto');
+const buyPriceText = document.querySelector<HTMLElement>('#buy-price');
+
+function dialogVisible(): boolean {
+  return Boolean((autoDialog && !autoDialog.hidden) || (buyDialog && !buyDialog.hidden));
+}
+
+function closeGameDialogs(): void {
+  if (autoDialog) autoDialog.hidden = true;
+  if (buyDialog) buyDialog.hidden = true;
+}
+
+function openAutoDialog(): void {
+  if (!gameState.interactive || freeSpins > 0 || infoOverlay.visible || !autoDialog) return;
+  if (autoTurboInput) autoTurboInput.checked = turbo;
+  if (autoQuickInput) autoQuickInput.checked = quickSpin;
+  autoDialog.hidden = false;
+}
+
+function openBuyDialog(): void {
+  if (!gameState.interactive || freeSpins > 0 || infoOverlay.visible || !buyDialog) return;
+  if (buyPriceText) buyPriceText.textContent = `${(BETS[betIndex] * 50).toFixed(2)} Noah`;
+  buyDialog.hidden = false;
+}
+
+function applySpinSpeedSettings(): void {
+  reelManager.setTurbo(turbo);
+  reelManager.setQuick(quickSpin);
+}
+
+function startConfiguredAuto(): void {
+  if (!gameState.interactive || freeSpins > 0) return;
+  turbo = autoTurboInput?.checked ?? false;
+  quickSpin = autoQuickInput?.checked ?? false;
+  applySpinSpeedSettings();
+  autoSpins = selectedAutoSpins;
+  closeGameDialogs();
+  statusText.text = `${selectedAutoSpins} otomatik dönüş başlatıldı.`;
+  updateHud();
+  void spin();
+}
+
+async function buyBonus(): Promise<void> {
+  if (!gameState.interactive || freeSpins > 0) return;
+  const cost = BETS[betIndex] * 50;
+  if (balance < cost) {
+    statusText.text = 'Bonus satın almak için demo bakiyesi yetersiz.';
+    const mobileStatus = document.querySelector('#mobile-status');
+    if (mobileStatus) mobileStatus.textContent = statusText.text;
+    return;
+  }
+
+  autoSpins = 0;
+  balance -= cost;
+  closeGameDialogs();
+  gameState.transition(GamePhase.BonusIntro);
+  statusText.text = 'Satın alınan Magic Anvil hazırlanıyor…';
+  updateHud();
+  const bonus = await anvilBonus.open(3);
+  freeSpins += bonus.freeSpins;
+  freeSpinMultiplier = bonus.multiplier;
+  statusText.text = `+${bonus.level} item • ${bonus.freeSpins} Free Spin • ${bonus.multiplier.toFixed(2)}x çarpan`;
+  gameState.transition(GamePhase.Idle);
+  updateHud();
+  if (freeSpins > 0) {
+    await wait(quickSpin ? 120 : 450);
+    void spin();
+  }
+}
+
+document.querySelectorAll<HTMLElement>('[data-close-dialog]').forEach((control) => {
+  control.addEventListener('click', closeGameDialogs);
+});
+document.querySelectorAll<HTMLButtonElement>('[data-spin-count]').forEach((control) => {
+  control.addEventListener('click', () => {
+    selectedAutoSpins = Number(control.dataset.spinCount ?? 25);
+    document.querySelectorAll('[data-spin-count]').forEach((button) => button.classList.remove('selected'));
+    control.classList.add('selected');
+    if (startAutoButton) startAutoButton.textContent = `OTOMATİK OYUNU BAŞLAT (${selectedAutoSpins})`;
+  });
+});
+startAutoButton?.addEventListener('click', startConfiguredAuto);
+document.querySelector('#confirm-buy')?.addEventListener('click', () => void buyBonus());
+
 function toggleInfo(): void {
-  if (!gameState.interactive) return;
+  if (!gameState.interactive || dialogVisible()) return;
   refreshInfo();
   infoOverlay.visible = !infoOverlay.visible;
 }
@@ -343,7 +446,7 @@ function refreshInfo(): void {
       `${index + 1}. ${entry.free ? 'FREE' : `${entry.bet.toFixed(0)} Noah`}  →  ${entry.win.toFixed(2)} Noah`,
     ).join('\n')
     : 'Henüz dönüş yapılmadı.';
-  infoBody.text = `20 ÖDEME ÇİZGİSİ • SOLDAN SAĞA 3+\nTrina WILD yerine geçer • 3+ kristal Magic Anvil açar\n\nSEMBOL                 3 / 4 / 5\n${paytable}\n\nSON 5 OYUN\n${history}\n\nSpace: Spin • A: Auto • T: Turbo • M: Ses • Kapatmak için dokun.`;
+  infoBody.text = `20 ÖDEME ÇİZGİSİ • SOLDAN SAĞA 3+\nTrina WILD yerine geçer • 3+ kristal Magic Anvil açar\n\nSEMBOL                 3 / 4 / 5\n${paytable}\n\nSON 5 OYUN\n${history}\n\nSpace: Spin • A: Auto • M: Ses • Kapatmak için dokun.`;
 }
 
 function toggleAuto(): void {
@@ -351,22 +454,13 @@ function toggleAuto(): void {
     autoSpins = 0;
     statusText.text = 'Otomatik dönüş durduruldu.';
   } else if (gameState.interactive && freeSpins === 0) {
-    autoSpins = 10;
-    statusText.text = '10 otomatik dönüş başlatıldı.';
-    void spin();
+    openAutoDialog();
   }
   updateHud();
 }
 
-function toggleTurbo(): void {
-  turbo = !turbo;
-  reelManager.setTurbo(turbo);
-  statusText.text = turbo ? 'Turbo modu açık.' : 'Turbo modu kapalı.';
-  updateHud();
-}
-
 function changeBet(direction: number): void {
-  if (!gameState.interactive || freeSpins > 0) return;
+  if (!gameState.interactive || freeSpins > 0 || dialogVisible()) return;
   betIndex = Math.max(0, Math.min(BETS.length - 1, betIndex + direction));
   updateHud();
 }
@@ -375,6 +469,7 @@ function updateHud(): void {
   balanceText.text = balance.toFixed(2);
   betText.text = `${BETS[betIndex].toFixed(2)} Noah`;
   winText.text = lastWin.toFixed(2);
+  lastSpinWinText.text = previousSpinWin.toFixed(2);
   spinLabel.text = gameState.state === GamePhase.Spinning || gameState.state === GamePhase.Stopping
     ? 'STOP'
     : gameState.state === GamePhase.Presenting
@@ -384,12 +479,11 @@ function updateHud(): void {
       : 'SPIN';
   document.querySelector('#mobile-balance')!.textContent = balance.toFixed(2);
   document.querySelector('#mobile-bet')!.textContent = BETS[betIndex].toFixed(2);
-  document.querySelector('#mobile-win')!.textContent = lastWin.toFixed(2);
+  document.querySelector('#mobile-win')!.textContent = previousSpinWin.toFixed(2);
   document.querySelector('#mobile-spin')!.textContent = spinLabel.text;
   (autoButton.children[1] as Text).text = autoSpins > 0 ? `A:${autoSpins}` : 'AUTO';
-  (turboButton.children[1] as Text).text = turbo ? '⚡ ON' : '⚡';
   document.querySelector('#mobile-auto')!.textContent = autoSpins > 0 ? `A:${autoSpins}` : 'AUTO';
-  document.querySelector('#mobile-turbo')!.textContent = turbo ? '⚡ON' : '⚡';
+  if (buyPriceText) buyPriceText.textContent = `${(BETS[betIndex] * 50).toFixed(2)} Noah`;
 }
 
 function wait(ms: number): Promise<void> {
@@ -432,7 +526,7 @@ async function spin(): Promise<void> {
     statusText.text = 'Kazanç sunumu tamamlanıyor…';
     return;
   }
-  if (!gameState.interactive || infoOverlay.visible) return;
+  if (!gameState.interactive || infoOverlay.visible || dialogVisible()) return;
   const bet = BETS[betIndex];
   const isFree = freeSpins > 0;
   if (!isFree && balance < bet) {
@@ -470,6 +564,7 @@ async function spin(): Promise<void> {
     };
   }
   lastWin = win.amount;
+  previousSpinWin = win.amount;
   balance += win.amount;
   spinHistory.push({ bet, win: win.amount, free: isFree });
   if (spinHistory.length > 20) spinHistory.shift();
@@ -501,10 +596,10 @@ async function spin(): Promise<void> {
   gameState.transition(GamePhase.Idle);
   updateHud();
   if (freeSpins > 0) {
-    await wait(turbo ? 90 : 450);
+    await wait(quickSpin ? 150 : 450);
     void spin();
   } else if (autoSpins > 0) {
-    await wait(turbo ? 90 : 420);
+    await wait(quickSpin ? 130 : 420);
     void spin();
   }
 }
@@ -524,7 +619,7 @@ document.querySelector('#mobile-spin')?.addEventListener('click', () => void spi
 document.querySelector('#mobile-bet-down')?.addEventListener('click', () => changeBet(-1));
 document.querySelector('#mobile-bet-up')?.addEventListener('click', () => changeBet(1));
 document.querySelector('#mobile-auto')?.addEventListener('click', toggleAuto);
-document.querySelector('#mobile-turbo')?.addEventListener('click', toggleTurbo);
+document.querySelector('#mobile-buy')?.addEventListener('click', openBuyDialog);
 document.querySelector('#mobile-info')?.addEventListener('click', toggleInfo);
 document.querySelector('#mobile-mute')?.addEventListener('click', () => {
   const muted = audioManager.toggleMute();
@@ -548,6 +643,10 @@ window.addEventListener('keydown', (event) => {
     }
     return;
   }
+  if (dialogVisible()) {
+    if (event.key === 'Escape') closeGameDialogs();
+    return;
+  }
   if ((event.target as HTMLElement).matches('input, button')) return;
   if (event.code === 'Space') {
     event.preventDefault();
@@ -560,7 +659,6 @@ window.addEventListener('keydown', (event) => {
     (document.querySelector('#mobile-mute') as HTMLButtonElement).textContent = muted ? '×' : '♪';
   } else if (event.key.toLowerCase() === 'i') toggleInfo();
   else if (event.key.toLowerCase() === 'a') toggleAuto();
-  else if (event.key.toLowerCase() === 't') toggleTurbo();
 });
 
 function resize(): void {
@@ -582,7 +680,10 @@ function resize(): void {
     infoButton,
     muteButton,
     autoButton,
-    turboButton,
+    buyButton,
+    lastWinPanel,
+    lastWinCaption,
+    lastSpinWinText,
     ...desktopStatCaptions,
   ];
   desktopOnly.forEach((element) => { element.visible = !portrait; });

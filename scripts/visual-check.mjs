@@ -56,6 +56,35 @@ try {
   await page.click('#enter-game');
   await page.waitForSelector('#intro-screen', { state: 'hidden' });
 
+  await page.goto(`${baseUrl}/?skipIntro=1`, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.moradonDebug?.getState() === 'idle');
+  await page.mouse.click(1135, 551);
+  await page.waitForSelector('#auto-dialog', { state: 'visible' });
+  await page.click('[data-spin-count="50"]');
+  await page.click('.option-card:has(#auto-turbo)');
+  await page.click('.option-card:has(#auto-quick)');
+  if (!(await page.textContent('#start-auto'))?.includes('50')) throw new Error('Auto spin count was not updated.');
+  await page.screenshot({ path: fileURLToPath(new URL('auto-settings-desktop.png', artifacts)) });
+  const combinedSpeedStarted = Date.now();
+  await page.click('#start-auto');
+  await page.waitForFunction(() => window.moradonDebug?.getState() === 'spinning');
+  await page.waitForFunction(
+    () => ['presenting', 'idle'].includes(window.moradonDebug?.getState()),
+    null,
+    { timeout: 1800 },
+  );
+  const combinedSpeedDuration = Date.now() - combinedSpeedStarted;
+  if (combinedSpeedDuration > 1500) throw new Error(`Combined Turbo/Quick spin took ${combinedSpeedDuration}ms.`);
+  await page.goto(`${baseUrl}/?skipIntro=1`, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.moradonDebug?.getState() === 'idle');
+  await page.mouse.click(50, 245);
+  await page.waitForSelector('#buy-dialog', { state: 'visible' });
+  if ((await page.textContent('#buy-price'))?.trim() !== '500.00 Noah') throw new Error('Buy bonus price is incorrect.');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: fileURLToPath(new URL('buy-bonus-desktop.png', artifacts)) });
+  await page.click('#confirm-buy');
+  await page.waitForFunction(() => window.moradonDebug?.getState() === 'bonus-intro');
+
   await page.goto(`${baseUrl}/?scene=anvil&skipIntro=1`, { waitUntil: 'networkidle' });
   await page.waitForSelector('#loading.hidden');
   await page.waitForFunction(() => window.moradonDebug?.getState() === 'bonus-intro');
@@ -105,6 +134,14 @@ try {
   await page.goto(`${baseUrl}/?skipIntro=1`, { waitUntil: 'networkidle' });
   await page.waitForSelector('#loading.hidden');
   await page.waitForSelector('#mobile-hud', { state: 'visible' });
+  await page.click('#mobile-auto');
+  await page.waitForSelector('#auto-dialog', { state: 'visible' });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: fileURLToPath(new URL('auto-settings-mobile.png', artifacts)) });
+  await page.click('#auto-dialog .dialog-close');
+  await page.click('#mobile-buy');
+  await page.waitForSelector('#buy-dialog', { state: 'visible' });
+  await page.click('#buy-dialog .dialog-close');
   await page.click('#mobile-spin');
   await page.waitForFunction(() => window.moradonDebug?.getState() === 'spinning');
   await page.waitForTimeout(320);
@@ -115,7 +152,7 @@ try {
   if (runtimeErrors.length > 0) {
     throw new Error(`Browser runtime errors:\n${runtimeErrors.join('\n')}`);
   }
-  process.stdout.write(`Visual runtime checks passed: intro, Anvil, Big Win, paytable, portrait mobile, ${quickStopDuration}ms quick stop and ${presentationSkipDuration}ms presentation skip.\n`);
+  process.stdout.write(`Visual runtime checks passed: intro, Auto settings, ${combinedSpeedDuration}ms combined Turbo/Quick spin, Bonus Buy, Anvil, Big Win, paytable, portrait mobile, ${quickStopDuration}ms quick stop and ${presentationSkipDuration}ms presentation skip.\n`);
 } finally {
   await browser?.close();
   server.kill();
