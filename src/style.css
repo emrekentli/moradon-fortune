@@ -320,6 +320,10 @@ canvas {
 }
 
 @media (orientation: portrait) and (max-width: 700px) {
+  body {
+    background-position: center top;
+  }
+
   .intro-content { padding-bottom: 90px; }
   .intro-emblem { width: 56px; height: 56px; margin-bottom: 18px; }
   .intro-emblem::after { inset: 18px; }
@@ -331,14 +335,15 @@ canvas {
   #mobile-hud {
     position: fixed;
     right: 12px;
-    bottom: max(14px, env(safe-area-inset-bottom));
+    top: calc(var(--mobile-board-bottom, 300px) + 12px);
+    bottom: auto;
     left: 12px;
     z-index: 4;
     display: grid;
-    gap: 10px;
-    padding: 15px;
+    gap: 8px;
+    padding: 12px;
     border: 2px solid #bd8b34;
-    border-radius: 18px;
+    border-radius: 16px;
     color: #f6dda0;
     background: linear-gradient(160deg, rgb(20 15 29 / 97%), rgb(5 7 12 / 97%));
     box-shadow: 0 12px 35px #000, inset 0 0 30px rgb(197 139 48 / 10%);
@@ -348,50 +353,69 @@ canvas {
   #mobile-hud > strong {
     color: #ffdc75;
     font-family: Cinzel, serif;
-    font-size: 18px;
+    font-size: clamp(16px, 4.8vw, 20px);
     letter-spacing: .08em;
   }
 
   #mobile-status {
-    min-height: 18px;
+    min-height: 15px;
     color: #d8cab0;
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1.35;
   }
 
-  .mobile-stats,
-  .mobile-actions {
+  .mobile-stats {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .mobile-stats span {
     flex: 1;
     color: #a99c84;
-    font-size: 9px;
+    font-size: 8px;
+    letter-spacing: .08em;
   }
 
   .mobile-stats b {
     display: block;
-    margin-top: 3px;
+    margin-top: 2px;
     color: #ffe492;
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .mobile-actions {
+    display: grid;
+    grid-template-columns: 48px 1fr 1fr 48px;
+    gap: 7px;
   }
 
   .mobile-actions button {
-    min-width: 46px;
-    min-height: 48px;
-    border: 2px solid #e0b64e;
-    border-radius: 24px;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 8px;
+    border: 1px solid #e0b64e;
+    border-radius: 21px;
     color: #fff0bd;
-    background: #252039;
-    font: 800 18px Montserrat, sans-serif;
+    background: linear-gradient(#302943, #1a1727);
+    box-shadow: inset 0 0 12px rgb(220 171 68 / 8%);
+    font: 800 14px Montserrat, sans-serif;
+    touch-action: manipulation;
   }
 
   #mobile-spin {
-    flex: 1;
+    grid-column: 2 / 4;
     background: linear-gradient(#bc3929, #791a18);
+    font-family: Cinzel, serif;
+    font-size: 17px;
+    letter-spacing: .06em;
   }
+
+  #mobile-bet-down { grid-column: 1; grid-row: 1; font-size: 21px; }
+  #mobile-bet-up { grid-column: 4; grid-row: 1; font-size: 21px; }
+  #mobile-auto { grid-column: 1 / 2; grid-row: 2; }
+  #mobile-turbo { grid-column: 2 / 3; grid-row: 2; }
+  #mobile-info { grid-column: 3 / 4; grid-row: 2; }
+  #mobile-mute { grid-column: 4 / 5; grid-row: 2; font-size: 18px; }
 }

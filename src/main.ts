@@ -212,12 +212,14 @@ let forcedResult: SpinMatrix | null = null;
 let autoSpins = 0;
 let turbo = false;
 const spinHistory: Array<{ bet: number; win: number; free: boolean }> = [];
+const desktopStatCaptions: Text[] = [];
 
 function addStat(label: string, x: number): Text {
   const caption = makeText(label, 12, 0xb9a77e, '600');
   caption.anchor.set(0.5);
   caption.position.set(x, 618);
   world.addChild(caption);
+  desktopStatCaptions.push(caption);
   const value = makeText('0', 24, 0xffe28b, '800');
   value.anchor.set(0.5);
   value.position.set(x, 651);
@@ -563,14 +565,54 @@ window.addEventListener('keydown', (event) => {
 
 function resize(): void {
   const portrait = app.screen.width < app.screen.height && app.screen.width <= 700;
-  const scale = portrait
-    ? app.screen.width / 1100
-    : Math.min(app.screen.width / DESIGN_W, app.screen.height / DESIGN_H);
+  const desktopOnly = [
+    bg,
+    shade,
+    topShade,
+    title,
+    subtitle,
+    statusText,
+    hud,
+    balanceText,
+    betText,
+    winText,
+    betDown,
+    betUp,
+    spinButton,
+    infoButton,
+    muteButton,
+    autoButton,
+    turboButton,
+    ...desktopStatCaptions,
+  ];
+  desktopOnly.forEach((element) => { element.visible = !portrait; });
+
+  if (portrait) {
+    const cabinetWidth = CELL_W * COLS + 44;
+    const cabinetHeight = CELL_H * ROWS + 44;
+    const scale = (app.screen.width - 16) / cabinetWidth;
+    const boardTop = Math.max(92, Math.min(142, app.screen.height * 0.15));
+    const boardLeft = REEL_X - 22;
+    const boardY = REEL_Y - 22;
+    world.scale.set(scale);
+    world.position.set(
+      (app.screen.width - cabinetWidth * scale) / 2 - boardLeft * scale,
+      boardTop - boardY * scale,
+    );
+    document.documentElement.style.setProperty(
+      '--mobile-board-bottom',
+      `${Math.round(boardTop + cabinetHeight * scale)}px`,
+    );
+    return;
+  }
+
+  document.documentElement.style.removeProperty('--mobile-board-bottom');
+  const scale = Math.min(app.screen.width / DESIGN_W, app.screen.height / DESIGN_H);
   bg.visible = !portrait;
   world.scale.set(scale);
   world.position.set(
     (app.screen.width - DESIGN_W * scale) / 2,
-    portrait ? Math.max(88, app.screen.height * 0.13) : (app.screen.height - DESIGN_H * scale) / 2,
+    (app.screen.height - DESIGN_H * scale) / 2,
   );
 }
 
