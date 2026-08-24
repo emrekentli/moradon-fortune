@@ -156,7 +156,7 @@ export class AnvilBonus {
     this.container.visible = true;
     this.weapon.rotation = 0;
     this.weapon.tint = 0xffffff;
-    this.statusText.text = 'Trina’yı seçersen sonraki denemenin şansı %15 artar.';
+    this.statusText.text = 'Trina’yı seçersen sonraki upgrade şansı %15 artar.';
     this.trinaBadge.visible = true;
     this.actionLabel.text = 'YÜKSELT';
     this.drawActionButton(0x176d31);

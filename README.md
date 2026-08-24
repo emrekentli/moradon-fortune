@@ -53,7 +53,7 @@ Geliştirici paneli için oyunu `/?debug=1` adresinde açın. Buradan seed uygul
 
 ## Matematik doğrulaması
 
-Sabit `20260824` seed’i ve 1.000.000 ücretli spin ile son doğrulama; yeni sabit reel strip, oyuncunun Trina kullandığı Magic Anvil Free Spin’leri ve retrigger’lar dahil yaklaşık `%96.426` toplam RTP üretmiştir. Sonuçlar seed ve örneklem büyüklüğüne göre küçük sapmalar gösterebilir.
+Sabit `20260824` seed’i ve 1.000.000 ücretli spin ile son doğrulama; yeni sabit reel strip, item yanana veya +8 olana kadar süren Magic Anvil Free Spin’leri ve retrigger’lar dahil yaklaşık `%96.489` toplam RTP üretmiştir. Sonuçlar seed ve örneklem büyüklüğüne göre küçük sapmalar gösterebilir.
 
 ## Görsel kaynaklar
 
